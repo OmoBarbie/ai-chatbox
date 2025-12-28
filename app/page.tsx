@@ -111,7 +111,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   // theme: "light" | "dark"
-const [theme, setTheme] = useState<"light" | "dark">("light");  const [theme, setTheme] = useState<"light" | "dark">("light");
+  // theme: "light" | "dark"
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   const listRef = useRef<HTMLDivElement | null>(null);
 
@@ -130,14 +131,23 @@ const [theme, setTheme] = useState<"light" | "dark">("light");  const [theme, se
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved) as { messages?: Msg[] };
+        if (parsed?.messages?.length) setMessages(parsed.messages);
       }
 
-  // Persist state
+      const savedTheme = localStorage.getItem(THEME_KEY) as "light" | "dark" | null;
+      if (savedTheme === "light" || savedTheme === "dark") setTheme(savedTheme);
+    } catch {}
+  }, []);
+
+  // Persist messages
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ messages }));
     } catch {}
   }, [messages]);
+
 
   // Apply theme to <html>
   useEffect(() => {
@@ -283,8 +293,8 @@ const [theme, setTheme] = useState<"light" | "dark">("light");  const [theme, se
               />
 
               <button
-                className="rounded-xl border border-zinc-200 bg-zinc-900 px-4 py-3 text-sm font-semibold text-white shadow-sm
-                           disabled:opacity-60 dark:bg-white dark:text-zinc-900 dark:border-white"
+className="rounded-xl border border-zinc-200 bg-zinc-900 px-4 py-3 text-sm font-semibold text-white shadow-sm disabled:opacity-60 dark:bg-white dark:text-zinc-900 dark:border-white"
+
                 onClick={sendMessage}
                 disabled={loading || !input.trim()}
               >
